@@ -422,7 +422,7 @@ static void panel_simple_dsi_read_panel_id(struct panel_simple *panel)
 	mipi_dsi_set_maximum_return_packet_size(panel->dsi, 
 						ARRAY_SIZE(panel->panel_id));
 
-	mipi_dsi_generic_read(panel->dsi, &MIPI_DCS_GET_DISPLAY_ID, 1, 
+	mipi_dsi_generic_read(panel->dsi, &(MIPI_DCS_GET_DISPLAY_ID), 1, 
 			      panel->panel_id, ARRAY_SIZE(panel->panel_id));
 	/*
 	 * V1 panel id is [30 52]
@@ -478,12 +478,12 @@ static int panel_simple_get_cmds(struct panel_simple *panel,
 	int err;
 
 	err = panel_simple_of_get_cmd(panel->dev, np, "panel-init-sequence",
-				      &panel->on_cmds;
+				      &panel->on_cmds);
 	if (err)
 		return err;
 
 	err = panel_simple_of_get_cmd(panel->dev, np, "panel-exit-sequence",
-				      &panel->off_cmds;
+				      &panel->off_cmds);
 	if (err)
 		return err;
 
@@ -529,7 +529,7 @@ static void panel_simple_dsi_reload_cmds(struct panel_simple *panel)
 			continue;
 		
 		of_property_read_u8_array(np, "id", id, ARRAY_SIZE(id));
-		
+
  		if (memcmp(panel->panel_id, id, ARRAY_SIZE(id)) == 0) {
 			panel->panel_found = true;
 			panel_simple_get_cmds(panel, np);
