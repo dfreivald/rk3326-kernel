@@ -446,27 +446,27 @@ static inline void panel_simple_dsi_read_panel_id(struct panel_simple *panel)
 static int panel_simple_of_get_cmd(struct device *dev,
 				   struct device_node *np,
 				   const char *propname,
-				   struct panel_cmds **cmd_seq)
+				   struct panel_cmds **ret_cmds)
 {
-	struct panel_cmds *seq = *cmd_seq;
+	struct panel_cmds *cmds = *ret_cmds;
 	const void *data;
 	int len;
 	int err;
 
 	data = of_get_property(np, propname, &len);
 	if (data) {
-		if (!seq)
-			seq = devm_kzalloc(dev, sizeof(*seq), GFP_KERNEL);
-		if (!seq)
+		if (!cmds)
+			cmds = devm_kzalloc(dev, sizeof(*cmds), GFP_KERNEL);
+		if (!cmds)
 			return -ENOMEM;
 
-		err = panel_simple_parse_cmds(dev, data, len, seq);
+		err = panel_simple_parse_cmds(dev, data, len, cmds);
 		if (err) {
 			dev_err(dev, "failed to parse %s\n", propname);
 			return err;
 		}
 
-		*cmd_seq = seq;
+		*ret_cmds = cmds;
 	}
 
 	return 0;
@@ -529,6 +529,7 @@ static void panel_simple_dsi_reload_cmds(struct panel_simple *panel)
 			continue;
 		
 		of_property_read_u8_array(np, "id", id, ARRAY_SIZE(id));
+		
  		if (memcmp(panel->panel_id, id, ARRAY_SIZE(id)) == 0) {
 			panel->panel_found = true;
 			panel_simple_get_cmds(panel, np);
