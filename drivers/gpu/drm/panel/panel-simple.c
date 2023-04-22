@@ -407,6 +407,7 @@ static int panel_simple_dsi_send_cmds(struct panel_simple *panel,
 }
 static void panel_simple_dsi_read_panel_id(struct panel_simple *panel)
 {
+	u8 id_reg = MIPI_DCS_GET_DISPLAY_ID;
 	/*
 	 * To support Anbernic's multiple 3.5" display revisions a 
 	 * panel id must be read from the lcd controller. 
@@ -422,7 +423,7 @@ static void panel_simple_dsi_read_panel_id(struct panel_simple *panel)
 	mipi_dsi_set_maximum_return_packet_size(panel->dsi, 
 						ARRAY_SIZE(panel->panel_id));
 
-	mipi_dsi_generic_read(panel->dsi, &(MIPI_DCS_GET_DISPLAY_ID), 1, 
+	mipi_dsi_generic_read(panel->dsi, &id_reg, 1, 
 			      panel->panel_id, ARRAY_SIZE(panel->panel_id));
 	/*
 	 * V1 panel id is [30 52]
@@ -491,7 +492,7 @@ static int panel_simple_get_cmds(struct panel_simple *panel,
 	if (!of_find_property(np, "id", NULL))
 		return 0;
 
-	of_property_read_u8_array(np, "id", panel->desc->id, 
+	of_property_read_u8_array(np, "id", (u8 *)panel->desc->id, 
 				  ARRAY_SIZE(panel->desc->id));
 	
 	err = panel_simple_of_get_cmd(panel->dev, np, "panel-read-id-sequence",
